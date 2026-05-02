@@ -1,0 +1,23 @@
+body {
+  background-image: url("../routly.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.nav1 {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95) 0%,
+    /* Very dark slate */ rgba(30, 41, 59, 0.95) 100%
+  ); /* Slightly lighter dark blue */
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 10px 30px -10px rgba(59, 130, 246, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.2);
+  color: white;
+}
+
+/* Add this inside your <style> or Tailwind config */
