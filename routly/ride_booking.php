@@ -11,22 +11,22 @@ $passenger_id = $_SESSION['passenger_id'];
 $step = isset($_POST['step']) ? $_POST['step'] : '1';
 
 // --- NEW: Vibe Check Logic ---
-// 1. Fetch the current passenger's preferences
+// Fetch the current  preferences
 $p_pref_sql = "SELECT chatty_flag, silent_flag, music_flag FROM passenger_preference WHERE passenger_id = '$passenger_id'";
 $p_pref_result = mysqli_query($conn, $p_pref_sql);
 $p_prefs = mysqli_fetch_assoc($p_pref_result);
 
-// Default to 0 if they haven't set preferences yet
+
 if (!$p_prefs) {
     $p_prefs = ['chatty_flag' => 0, 'silent_flag' => 0, 'music_flag' => 0];
 }
 
-// Check if form is submitted with women_driver_pref checkbox (for current ride)
+//check if women preference is selected
 $form_women_pref = isset($_POST['form_women_driver_pref']) ? 1 : 0;
 $use_women_filter = ($step == '1' && $form_women_pref) ? 1 : 0;
 
-// 2. Fetch drivers ALONG WITH their preferences using a LEFT JOIN
-// Filter by gender if women_driver_pref is enabled
+//driver preference is fetched along with women driver's preference is selected or not
+
 $gender_filter = ($use_women_filter == 1) ? " AND d.gender = 'Female'" : "";
 $drivers_sql = "SELECT d.driver_id, d.d_first_name, d.c_type, d.gender,
                        dp.chatty_flag, dp.silent_flag, dp.music_flag 
@@ -37,11 +37,11 @@ $drivers_result = mysqli_query($conn, $drivers_sql);
 
 $drivers_with_vibes = [];
 while($driver = mysqli_fetch_assoc($drivers_result)){
-    // Calculate the Vibe Match Score
+    
     $match_score = 0;
     $total_prefs = 3;
     
-    // Treat NULLs from the database as 0 for safe comparison
+    // bull value is converted to 0
     $d_chatty = $driver['chatty_flag'] ?? 0;
     $d_silent = $driver['silent_flag'] ?? 0;
     $d_music  = $driver['music_flag'] ?? 0;
@@ -52,7 +52,7 @@ while($driver = mysqli_fetch_assoc($drivers_result)){
     
     $driver['match_pct'] = round(($match_score / $total_prefs) * 100);
 
-    // Build a string of emojis for their vibe
+    
     $vibes = [];
     if ($d_chatty) $vibes[] = "🗣️ Chatty";
     if ($d_silent) $vibes[] = "🤫 Quiet";
@@ -63,13 +63,13 @@ while($driver = mysqli_fetch_assoc($drivers_result)){
     $drivers_with_vibes[] = $driver;
 }
 
-// Sort drivers so the highest vibe match is at the top of the dropdown!
+
 usort($drivers_with_vibes, function($a, $b) {
     return $b['match_pct'] <=> $a['match_pct'];
 });
-// -----------------------------
 
-// Fetch available routes with price
+
+// I fethced the routes along with the prices
 $routes_sql = "SELECT route_id, r_start, r_end, route_price FROM route WHERE no_go_flag = 0";
 $routes_result = mysqli_query($conn, $routes_sql);
 $routes = [];
@@ -77,7 +77,7 @@ while($route = mysqli_fetch_assoc($routes_result)){
     $routes[] = $route;
 }
 
-// Step 2: Calculate fare
+// I calculated the price here in step 2
 if($step == '2' && $_SERVER['REQUEST_METHOD'] == 'POST'){
     $selected_driver_id = $_POST['driver_id'];
     $selected_route_id = $_POST['route_id'];
@@ -91,12 +91,12 @@ if($step == '2' && $_SERVER['REQUEST_METHOD'] == 'POST'){
     $route_result = mysqli_query($conn, $route_sql);
     $route = mysqli_fetch_assoc($route_result);
 
-    // Check if passenger has an active subscription for this route
+    
     $sub_sql = "SELECT subscription_id FROM route_subscription WHERE passenger_id = '$passenger_id' AND route_id = '$selected_route_id' AND status = 'active' AND end_date > NOW()";
     $sub_result = mysqli_query($conn, $sub_sql);
     $has_subscription = mysqli_num_rows($sub_result) > 0;
 
-    // If they have a subscription, it's free. Otherwise, charge normal rate.
+    
     if($has_subscription) {
         $total_price = 0;
         $your_share = 0;
@@ -108,7 +108,7 @@ if($step == '2' && $_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 
-// Step 3: Save booking & Fetch Emergency Contact
+// In step 3 booking is saved and emergency contact is fetched from the database
 $contact_found = false;
 $emergency_name = "";
 $emergency_phone = "";
@@ -118,11 +118,11 @@ if($step == '3' && $_SERVER['REQUEST_METHOD'] == 'POST'){
     $selected_route_id = $_POST['route_id'];
     $your_share = $_POST['your_share'];
 
-    // Update passenger route
+    // I updataed passenger route here
     $sql = "UPDATE passenger_info SET route_id = '$selected_route_id' WHERE passenger_id = '$passenger_id'";
     $result = mysqli_query($conn, $sql);
 
-    // Fetch Emergency Contact
+    // I fetched emergency contact from here
     $e_sql = "SELECT e_name_first, e_name_last, e_phone FROM passenger_emergency WHERE passenger_id = '$passenger_id'";
     $e_result = mysqli_query($conn, $e_sql);
     
@@ -135,7 +135,7 @@ if($step == '3' && $_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 
 
-// Step 4: Save rating
+// iN STEP 4 I SAVED THE Rating
 if($step == '4' && $_SERVER['REQUEST_METHOD'] == 'POST'){
     $rating = $_POST['rating'];
     $driver_to_rate = $_POST['driver_to_rate'];
@@ -157,17 +157,17 @@ if($step == '4' && $_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="bg-white p-8 rounded shadow-md w-full max-w-lg">
 
     <?php if($step == '4'): ?>
-        <!-- Rating done -->
+        
         <h2 class="text-2xl font-bold mb-4 text-center">Thank You!</h2>
         <p class="text-green-600 text-xl font-bold text-center">Your rating has been submitted.</p>
         <a href="home.php" class="block mt-6 text-center text-blue-500 underline font-semibold">Return to Dashboard</a>
 
     <?php elseif($step == '3'): ?>
-        <!-- Booking done, show emergency button and rating form -->
+       
         <h2 class="text-2xl font-bold mb-4 text-center">Booking Confirmed!</h2>
         <p class="text-green-600 font-bold text-center mb-4">Ride booked! Your fare is $<?php echo $your_share; ?></p>
 
-        <!-- Emergency Contact UI -->
+        
         <?php if($contact_found): ?>
             <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
                 <p class="text-sm text-red-700 font-bold mb-2 text-center">Need Help?</p>
@@ -205,7 +205,7 @@ if($step == '4' && $_SERVER['REQUEST_METHOD'] == 'POST'){
         <a href="home.php" class="block mt-4 text-center text-gray-500 hover:text-black underline text-sm">Return to Dashboard</a>
 
     <?php elseif($step == '2'): ?>
-        <!-- Confirm fare -->
+        
         <h2 class="text-2xl font-bold mb-6 text-center">Confirm Your Ride</h2>
 
         <div class="mb-6 p-5 bg-gray-50 border border-gray-200 rounded-lg shadow-inner">
@@ -239,7 +239,7 @@ if($step == '4' && $_SERVER['REQUEST_METHOD'] == 'POST'){
         <a href="ride_booking.php" class="block mt-4 text-center text-blue-500 hover:text-blue-700 underline text-sm font-semibold">Go back</a>
 
     <?php else: ?>
-        <!-- Step 1: Selection form -->
+        <!-- This is step-1 -->
         <h2 class="text-3xl font-bold mb-2 text-center text-gray-800">Book a Ride</h2>
         <p class="text-center text-gray-500 mb-6">Find the perfect driver for your trip.</p>
 
@@ -298,20 +298,20 @@ if($step == '4' && $_SERVER['REQUEST_METHOD'] == 'POST'){
 </div>
 
 <script>
-// Real-time filtering of drivers based on women preference
+
 document.addEventListener('DOMContentLoaded', function() {
     const womenCheckbox = document.getElementById('womenDriverCheckbox');
     const driverSelect = document.querySelector('select[name="driver_id"]');
     
     if (womenCheckbox && driverSelect) {
-        // Store original options with gender data
+        // In here original data with gender option is stored
         const allOptions = Array.from(driverSelect.options).slice(1).map(opt => ({
             value: opt.value,
             text: opt.text,
             gender: opt.getAttribute('data-gender') || 'unknown'
         }));
         
-        // Function to update driver list based on checkbox state
+        
         function updateDriverList() {
             const showWomenOnly = womenCheckbox.checked;
             driverSelect.innerHTML = '<option value="">Choose a driver...</option>';
@@ -330,10 +330,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Apply filter on page load
+        
         updateDriverList();
         
-        // Apply filter on checkbox change
+        
         womenCheckbox.addEventListener('change', updateDriverList);
     }
 });
