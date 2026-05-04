@@ -11,12 +11,10 @@ if (!isset($_SESSION['passenger_id'])) {
 $passenger_id = $_SESSION['passenger_id'];
 $message = "";
 
-// ==========================================
-// 1. HANDLE DELETE REQUEST
-// ==========================================
+//Profile Deletion
 if (isset($_POST['delete_profile']) && $_POST['delete_profile'] == '1') {
     try {
-        // Delete from all related tables
+        
         $delete_queries = [
             "DELETE FROM passenger_preference WHERE passenger_id = ?",
             "DELETE FROM passenger_emergency WHERE passenger_id = ?",
@@ -30,7 +28,7 @@ if (isset($_POST['delete_profile']) && $_POST['delete_profile'] == '1') {
             $stmt->close();
         }
         
-        // Log out the user
+        // Log out 
         session_destroy();
         header("Location: login.php?deleted=1");
         exit();
@@ -39,9 +37,7 @@ if (isset($_POST['delete_profile']) && $_POST['delete_profile'] == '1') {
     }
 }
 
-// ==========================================
-// 2. HANDLE FORM SUBMISSION (UPDATE DB)
-// ==========================================
+//Edit Profile
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['delete_profile'])) {
     // Grab basic info
     $first_name = $_POST['first_name'];
@@ -100,9 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['delete_profile'])) {
     }
 }
 
-// ==========================================
-// 3. FETCH CURRENT DATA (TO PRE-FILL FORM)
-// ==========================================
+//Fetches current data
 $sql = "SELECT p.*, e.e_name_first, e.e_name_last, e.e_phone, pr.chatty_flag, pr.silent_flag, pr.music_flag 
         FROM passenger_info p 
         LEFT JOIN passenger_emergency e ON p.passenger_id = e.passenger_id 
@@ -144,7 +138,7 @@ $p_music   = isset($user_data['music_flag']) && $user_data['music_flag'] == 1;
 
 <div class="max-w-2xl mx-auto bg-white p-8 rounded shadow-md">
     
-    <!-- Top Navigation -->
+   
     <div class="flex justify-between items-center mb-6 border-b pb-4">
         <h2 class="text-3xl font-bold text-gray-800">Edit Profile</h2>
         <a href="home.php" class="text-blue-600 hover:underline font-semibold">&larr; Back to Dashboard</a>
@@ -154,7 +148,7 @@ $p_music   = isset($user_data['music_flag']) && $user_data['music_flag'] == 1;
 
     <form action="edit_profile.php" method="POST">
         
-        <!-- Basic Info -->
+      
         <h3 class="text-xl font-bold mb-4 text-gray-700">Your Information</h3>
         <div class="flex gap-4 mb-4">
             <div class="w-1/2">
@@ -187,7 +181,7 @@ $p_music   = isset($user_data['music_flag']) && $user_data['music_flag'] == 1;
             </select>
         </div>
 
-        <!-- Emergency Contact -->
+        
         <h3 class="text-xl font-bold mt-8 mb-4 text-gray-700 border-t pt-6">Emergency Contact</h3>
         <div class="flex gap-4 mb-4">
             <div class="w-1/2">
@@ -205,7 +199,7 @@ $p_music   = isset($user_data['music_flag']) && $user_data['music_flag'] == 1;
             <input type="tel" name="e_phone" value="<?php echo $e_phone; ?>" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-black">
         </div>
 
-        <!-- Ride Preferences -->
+       
         <h3 class="text-xl font-bold mt-8 mb-4 text-gray-700 border-t pt-6">Ride Preferences</h3>
         <div class="flex flex-col gap-3 mb-8">
             <label class="flex items-center gap-3 cursor-pointer">
@@ -227,7 +221,7 @@ $p_music   = isset($user_data['music_flag']) && $user_data['music_flag'] == 1;
         </button>
     </form>
 
-    <!-- Delete Profile Section -->
+    
     <div class="mt-12 pt-8 border-t border-gray-300">
         <h3 class="text-xl font-bold mb-4 text-gray-700">Danger Zone</h3>
         <p class="text-gray-600 mb-4">Permanently delete your profile and all associated data. This action cannot be undone.</p>
