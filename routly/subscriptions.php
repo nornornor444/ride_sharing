@@ -2,7 +2,6 @@
 session_start();
 require_once 'DBConnect.php';
 
-// Kick out users who aren't logged in
 if (!isset($_SESSION['passenger_id'])) {
     header("Location: login.php");
     exit();
@@ -11,12 +10,12 @@ if (!isset($_SESSION['passenger_id'])) {
 $passenger_id = $_SESSION['passenger_id'];
 $message = "";
 
-// Show success message if redirected from booking
+
 if (isset($_GET['success'])) {
     $message = '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">✅ <strong>Success!</strong> You have subscribed to this route.</div>';
 }
 
-// Handle subscription cancellation
+
 if (isset($_POST['cancel_subscription'])) {
     $subscription_id = $_POST['subscription_id'];
     
@@ -32,7 +31,7 @@ if (isset($_POST['cancel_subscription'])) {
     $stmt->close();
 }
 
-// Fetch all subscriptions for this passenger
+
 $subs_sql = "SELECT rs.*, r.r_start, r.r_end, r.route_price 
              FROM route_subscription rs 
              LEFT JOIN route r ON rs.route_id = r.route_id 
@@ -49,7 +48,7 @@ while ($row = $subs_result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Format subscription type for display
+
 function formatSubscriptionType($type) {
     $types = [
         '1week' => '1 Week',
@@ -61,7 +60,7 @@ function formatSubscriptionType($type) {
     return $types[$type] ?? $type;
 }
 
-// Determine status badge color
+
 function getStatusBadge($status) {
     switch ($status) {
         case 'active':
