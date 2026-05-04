@@ -10,8 +10,7 @@ if(!isset($_SESSION['passenger_id'])){
 $passenger_id = $_SESSION['passenger_id'];
 $step = isset($_POST['step']) ? $_POST['step'] : '1';
 
-// --- NEW: Vibe Check Logic ---
-// Fetch the current  preferences
+// VIBE Ckeck
 $p_pref_sql = "SELECT chatty_flag, silent_flag, music_flag FROM passenger_preference WHERE passenger_id = '$passenger_id'";
 $p_pref_result = mysqli_query($conn, $p_pref_sql);
 $p_prefs = mysqli_fetch_assoc($p_pref_result);
@@ -21,11 +20,11 @@ if (!$p_prefs) {
     $p_prefs = ['chatty_flag' => 0, 'silent_flag' => 0, 'music_flag' => 0];
 }
 
-//check if women preference is selected
+
 $form_women_pref = isset($_POST['form_women_driver_pref']) ? 1 : 0;
 $use_women_filter = ($step == '1' && $form_women_pref) ? 1 : 0;
 
-//driver preference is fetched along with women driver's preference is selected or not
+
 
 $gender_filter = ($use_women_filter == 1) ? " AND d.gender = 'Female'" : "";
 $drivers_sql = "SELECT d.driver_id, d.d_first_name, d.c_type, d.gender,
@@ -41,7 +40,7 @@ while($driver = mysqli_fetch_assoc($drivers_result)){
     $match_score = 0;
     $total_prefs = 3;
     
-    // bull value is converted to 0
+
     $d_chatty = $driver['chatty_flag'] ?? 0;
     $d_silent = $driver['silent_flag'] ?? 0;
     $d_music  = $driver['music_flag'] ?? 0;
