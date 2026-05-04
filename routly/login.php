@@ -1,6 +1,5 @@
 <?php
 session_start();
-// Make sure this exactly matches the capitalization of your file!
 require_once('DBConnect.php'); 
 
 $error_message = "";
@@ -9,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // 1. Secure Database Query using Prepared Statements
+
     $sql = "SELECT passenger_id, p_first_name, p_password FROM passenger_info WHERE p_email = ?";
     $stmt = $conn->prepare($sql);
 
@@ -18,18 +17,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
         $stmt->execute();
         $result = $stmt->get_result();
 
-        // 2. Check if the user exists
+        
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             
-            // 3. Verify the hashed password against what they typed
+            
             if (password_verify($password, $row['p_password'])) {
                 
-                // Login successful! Set session variables
+                
                 $_SESSION['passenger_id'] = $row['passenger_id'];
                 $_SESSION['p_first_name'] = $row['p_first_name'];
                 
-                // Redirect to the home page
+            
                 header("Location: home.php");
                 exit();
             } else {
@@ -60,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
 <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
     <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Welcome Back</h2>
 
-    <!-- Display Error Message if login fails -->
     <?php if(!empty($error_message)): ?>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span class="block sm:inline"><?php echo $error_message; ?></span>
