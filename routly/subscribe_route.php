@@ -2,7 +2,7 @@
 session_start();
 require_once 'DBConnect.php';
 
-// Kick out users who aren't logged in
+
 if (!isset($_SESSION['passenger_id'])) {
     header("Location: login.php");
     exit();
@@ -11,7 +11,7 @@ if (!isset($_SESSION['passenger_id'])) {
 $passenger_id = $_SESSION['passenger_id'];
 $message = "";
 
-// Handle subscription creation
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['subscribe'])) {
     $route_id = intval($_POST['route_id']);
     $subscription_type = $_POST['subscription_type'];
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['subscribe'])) {
                 break;
         }
         
-        // Check if subscription already exists
+        
         $check_sql = "SELECT subscription_id FROM route_subscription WHERE passenger_id = '$passenger_id' AND route_id = '$route_id' AND status = 'active'";
         $check_result = mysqli_query($conn, $check_sql);
         
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['subscribe'])) {
     }
 }
 
-// Fetch all routes
+
 $routes_sql = "SELECT route_id, r_start, r_end, route_price FROM route WHERE no_go_flag = 0 ORDER BY r_start ASC";
 $routes_result = mysqli_query($conn, $routes_sql);
 $routes = [];
@@ -70,7 +70,7 @@ while($route = mysqli_fetch_assoc($routes_result)){
     $routes[] = $route;
 }
 
-// Get user's existing subscriptions
+
 $user_subs_sql = "SELECT route_id FROM route_subscription WHERE passenger_id = '$passenger_id' AND status = 'active'";
 $user_subs_result = mysqli_query($conn, $user_subs_sql);
 $user_subscribed_routes = [];
